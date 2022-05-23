@@ -1,0 +1,20 @@
+.profile__avatar-button {
+  background-color: rgba(0, 0, 0, 0);
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: .4s;
+}
+
+.profile__avatar-button:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  background-image: url(../../../images/avatarAddButton.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+}
