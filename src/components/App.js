@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
@@ -9,20 +9,28 @@ import AddPlacePopup from "./AddPlacePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import EditProfilePopup from "./EditProfilePopup";
 import Login from "./Login";
+import Register from "./Register";
+import InfoTooltip from "./InfoTooltip";
+import ProtectedRoute from "./ProtectedRoute";
 import { api } from "../utils/Api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import * as auth from "../utils/Auth";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isDeletePopup, setIsDeletePopup] = useState(false);
+  const [isInfoTooltipPopup, setIsInfoTooltipPopup] = useState(false); 
   const [selectedCard, setSelectedCard] = useState({});
   const [cardDeleted, setCardDeleted] = useState({});
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false)
+  const history = useHistory();
 
   //получение информации
   useEffect(() => {
@@ -31,10 +39,26 @@ function App() {
         setCurrentUser(userInfo);
         setCards(cards);
       })
-      .catch((err) => {
-        console.log("ERROR! =>", err);
-      });
+      .catch((err) => console.log("ERROR! =>", err));
   }, []);
+
+  //проверка токена
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+
+    if (token) {
+      auth
+        .checkToken(token)
+        .then((res) => {
+          if (res) {
+            setIsLoggedIn(true);
+            setEmail(res.data.email);
+            history.push("/");
+          }
+        })
+        .catch((err) => console.log("ERROR! =>", err));
+    }
+  }, [history, isLoggedIn]);
 
   //открытие попапов
   function handleEditProfileClick() {
@@ -47,6 +71,10 @@ function App() {
 
   function handleAddPlaceClick() {
     setIsAddPlacePopupOpen(true);
+  }
+
+  function handleInfoTooltipClick() {
+    setIsInfoTooltipPopup(true);
   }
 
   function handleCardClick(card) {
@@ -140,32 +168,84 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsImagePopupOpen(false);
     setIsDeletePopup(false);
+    setIsInfoTooltipPopup(false)
   }
 
-  function hadleLogin(e) {
-    e.preventDefault();
-    setLoggedIn(true);
+  //регистрация пользователя
+  function handleRegister(email, password) {
+    auth
+      .register(email, password)
+      .then(() => {
+        setIsInfoTooltipPopup(true)
+        setIsSuccess(true)
+        console.log(isSuccess)
+        history.push("/sign-in");
+      })
+      .catch((err) => {
+        if (err.status === 400) {
+          console.log("400 - не передано одно из полей");
+        }
+        setIsSuccess(false)
+        setIsInfoTooltipPopup(true)
+      });
   }
+
+  //авторизация пользователя
+  function hadleLogin(email, password) {
+    auth
+      .login(email, password)
+      .then(() => {
+        setIsLoggedIn(true);
+        setEmail(email);
+        history.push("/");
+      })
+
+      .catch((err) => {
+        if (err.status === 400) {
+          console.log("400 - не передано одно из полей");
+        } else if (err.status === 401) {
+          console.log("401 - пользователь с email не найден");
+        }
+      });
+  }
+
+  //выход из системы
+  function handleSignOut() {
+    localStorage.removeItem('jwt');
+    history.push("/sign-in");
+  }
+
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header />
+        <Header email={email} onSignOut={handleSignOut} />
 
-        <Routes>
-          <Route path="/signin" element={<Login onLogin={hadleLogin}/>}>
+        <Switch>
+          <ProtectedRoute
+            exact
+            path="/"
+            isLoggedIn={isLoggedIn}
+            component={Main}
+            cards={cards}
+            onEditProfilePopupOpen={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onEditAvatar={handleEditAvatarClick}
+            onCardClick={handleCardClick}
+            onCardDelete={handleDeleteConfirm}
+            onCardLike={handleCardLike}
+          />
+          <Route path="/sign-up">
+            <Register onRegister={handleRegister} />
           </Route>
-        </Routes>
+          <Route path="/sign-in">
+            <Login onLogin={hadleLogin} />
+          </Route>
+          <Route>
+            {isLoggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+          </Route>
+        </Switch>
 
-        <Main
-          cards={cards}
-          onEditProfilePopupOpen={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
-          onEditAvatar={handleEditAvatarClick}
-          onCardClick={handleCardClick}
-          onCardDelete={handleDeleteConfirm}
-          onCardLike={handleCardLike}
-        />
         <Footer />
         <PopupWithForm
           name="delete"
@@ -199,6 +279,12 @@ function App() {
           isOpen={isImagePopupOpen}
           onClose={closeAllPopups}
         />
+
+        <InfoTooltip
+          isOpen={isInfoTooltipPopup}
+          onClose={closeAllPopups}
+          isSuccess={isSuccess}
+        ></InfoTooltip>
       </div>
     </CurrentUserContext.Provider>
   );

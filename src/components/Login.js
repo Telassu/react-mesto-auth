@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import * as auth from "../utils/Auth";
 
 function Login(props) {
-  const [email, setEmail] = useState(" ");
-  const [password, setPassword] = useState(" ");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   function handleChangeEmail(e) {
     setEmail(e.target.value);
@@ -15,39 +14,18 @@ function Login(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
-
-    if (!email || !password) {
-      return;
-    }
-
-    auth
-      .login(email, password)
-      .then((data) => {
-        if (data.jwt) {
-          setEmail(email);
-          setPassword(password);
-          props.handleLogin();
-          props.history.push("/");
-        }
-      })
-      .catch((err) => {
-        if (err.status === 400) {
-          console.log("400 - не передано одно из полей");
-        } else if (err.status === 401) {
-          console.log("401 - пользователь с email не найден");
-        }
-      });
+    props.onLogin(email, password);
   }
 
   return (
-    <div className="login">
-      <h2 className="login__title">Вход</h2>
-      <form className="login__form" name="login" onSubmit={handleSubmit}>
+    <div className="auth">
+      <h2 className="auth__title">Вход</h2>
+      <form className="auth__form" name="login" onSubmit={handleSubmit}>
         <input
           type="email"
           name="email"
           id="email"
-          className="login__input login__input_type_email"
+          className="auth__input auth__input_type_email"
           placeholder="E-mail"
           minLength="2"
           maxLength="40"
@@ -55,12 +33,12 @@ function Login(props) {
           onChange={handleChangeEmail}
           value={email || ""}
         />
-        <span className="login__input-error email-input-error"></span>
+        <span className="auth__input-error email-input-error"></span>
         <input
-          type="text"
+          type="password"
           name="password"
           id="password"
-          className="login__input login__input_type_password"
+          className="auth__input auth__input_type_password"
           placeholder="Пароль"
           minLength="5"
           maxLength="20"
@@ -68,8 +46,8 @@ function Login(props) {
           onChange={handleChangePassword}
           value={password || ""}
         />
-        <span className="login__input-error password-input-error"></span>
-        <button className="login__save-button" type="submit" aria-label="вход">
+        <span className="auth__input-error password-input-error"></span>
+        <button className="auth__save-button" type="submit" aria-label="вход">
           Войти
         </button>
       </form>
