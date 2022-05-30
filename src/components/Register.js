@@ -20,7 +20,7 @@ function Register(props) {
 
   return (
     <div className="auth">
-      <h2 className="auth__title">Вход</h2>
+      <h2 className="auth__title">Регистрация</h2>
       <form className="auth__form" name="register" onSubmit={handleSubmit}>
         <input
           type="email"
@@ -51,7 +51,7 @@ function Register(props) {
         <button className="auth__save-button" type="submit" aria-label="вход">
           Зарегистрироваться
         </button>
-        <p>Уже зарегистрированы? <Link to="/sign-in" className="auth__link">Войти</Link></p>
+        <p className="auth__text">Уже зарегистрированы? <Link to="/sign-in" className="auth__link">Войти</Link></p>
       </form>
     </div>
   );

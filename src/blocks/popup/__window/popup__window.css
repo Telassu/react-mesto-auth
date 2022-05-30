@@ -1,8 +1,9 @@
 .popup__window {
   box-sizing: border-box;
   display: flex;
+  align-items: center;
   min-height: 120px;
-  max-height: 330px;
+  max-height: 430px;
   flex-direction: column;
   z-index: 2;
   background-color: #fff;

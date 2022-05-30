@@ -1,4 +1,6 @@
 .header {
+  display: flex;
+  justify-content: space-between;
   width: 100%;
   max-width: 880px;
   min-height: 74px;
@@ -10,5 +12,6 @@
   .header {    
     min-height: 56px;
     margin-top: 28px;
+    flex-direction: column;
   }
 }

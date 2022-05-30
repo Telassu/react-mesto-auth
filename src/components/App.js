@@ -21,7 +21,7 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isDeletePopup, setIsDeletePopup] = useState(false);
-  const [isInfoTooltipPopup, setIsInfoTooltipPopup] = useState(false); 
+  const [isInfoTooltipPopup, setIsInfoTooltipPopup] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
   const [cardDeleted, setCardDeleted] = useState({});
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
@@ -29,7 +29,7 @@ function App() {
   const [cards, setCards] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false);
   const history = useHistory();
 
   //получение информации
@@ -168,7 +168,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsImagePopupOpen(false);
     setIsDeletePopup(false);
-    setIsInfoTooltipPopup(false)
+    setIsInfoTooltipPopup(false);
   }
 
   //регистрация пользователя
@@ -176,17 +176,17 @@ function App() {
     auth
       .register(email, password)
       .then(() => {
-        setIsInfoTooltipPopup(true)
-        setIsSuccess(true)
-        console.log(isSuccess)
+        setIsInfoTooltipPopup(true);
+        setIsSuccess(true);
+        console.log(isSuccess);
         history.push("/sign-in");
       })
       .catch((err) => {
         if (err.status === 400) {
           console.log("400 - не передано одно из полей");
         }
-        setIsSuccess(false)
-        setIsInfoTooltipPopup(true)
+        setIsSuccess(false);
+        setIsInfoTooltipPopup(true);
       });
   }
 
@@ -206,15 +206,16 @@ function App() {
         } else if (err.status === 401) {
           console.log("401 - пользователь с email не найден");
         }
+        setIsInfoTooltipPopup(true);
       });
   }
 
   //выход из системы
   function handleSignOut() {
-    localStorage.removeItem('jwt');
+    localStorage.removeItem("jwt");
+    setIsLoggedIn(false);
     history.push("/sign-in");
   }
-
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
