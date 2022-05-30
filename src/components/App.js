@@ -58,7 +58,7 @@ function App() {
         })
         .catch((err) => console.log("ERROR! =>", err));
     }
-  }, [history, isLoggedIn]);
+  }, []);
 
   //открытие попапов
   function handleEditProfileClick() {
@@ -133,7 +133,7 @@ function App() {
     api
       .deleteCard(cardDeleted._id)
       .then(() => {
-        const newCards = cards.filter((element) => element !== cardDeleted);
+        const newCards = cards.filter((element) => element._id !== cardDeleted._id);
         setCards(newCards);
         closeAllPopups();
       })
@@ -178,7 +178,6 @@ function App() {
       .then(() => {
         setIsInfoTooltipPopup(true);
         setIsSuccess(true);
-        console.log(isSuccess);
         history.push("/sign-in");
       })
       .catch((err) => {
@@ -194,7 +193,8 @@ function App() {
   function hadleLogin(email, password) {
     auth
       .login(email, password)
-      .then(() => {
+      .then((res) =>  {
+        localStorage.setItem("jwt", res.token)
         setIsLoggedIn(true);
         setEmail(email);
         history.push("/");

@@ -33,9 +33,6 @@ export const login = (email, password) => {
     }),
   })
       .then(checkRes)
-      .then((res) => {
-        localStorage.setItem("jwt", res.token);
-    })
 };
 
 
