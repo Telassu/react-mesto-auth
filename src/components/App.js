@@ -73,10 +73,6 @@ function App() {
     setIsAddPlacePopupOpen(true);
   }
 
-  function handleInfoTooltipClick() {
-    setIsInfoTooltipPopup(true);
-  }
-
   function handleCardClick(card) {
     setIsImagePopupOpen(true);
     setSelectedCard(card);
