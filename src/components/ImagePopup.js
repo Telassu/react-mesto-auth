@@ -1,8 +1,8 @@
 import React from "react";
 
-function ImagePopup({ card, isOpen, onClose }) {
+function ImagePopup({ card, isOpen, onClose, onClickClose }) {
   return (
-    <div className={`popup ${isOpen && "popup_opened"} imageView`}>
+    <div className={`popup ${isOpen && "popup_opened"} imageView`} onClick={onClickClose}>
       <figure className="imageView__figure">
         <img className="imageView__image" src={card.link} alt={card.name} />
         <figcaption className="imageView__caption">{card.name}</figcaption>

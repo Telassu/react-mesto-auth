@@ -30,6 +30,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
 
   //получение информации
@@ -85,6 +86,8 @@ function App() {
 
   //обновление информации пользователя
   function handleOnUpdateUser(data) {
+    setIsLoading(true);
+
     api
       .editUserInfo(data.name, data.about)
       .then((data) => {
@@ -93,11 +96,14 @@ function App() {
       })
       .catch((err) => {
         console.log("ERROR! =>", err);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }
 
   //обновление аватара
   function handleOnUpdateAvatar(data) {
+    setIsLoading(true);
+
     api
       .editNewAvatar(data.avatar)
       .then((data) => {
@@ -106,11 +112,14 @@ function App() {
       })
       .catch((err) => {
         console.log("ERROR! =>", err);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }
 
   //добавление карточки
   function handleAddPlaceSubmit(data) {
+    setIsLoading(true);
+
     api
       .editNewCard(data.name, data.link)
       .then((data) => {
@@ -119,12 +128,15 @@ function App() {
       })
       .catch((err) => {
         console.log("ERROR! =>", err);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }
 
   //удаление карточки
   function handleDeleteClick(evt) {
     evt.preventDefault();
+
+    setIsLoading(true);
 
     api
       .deleteCard(cardDeleted._id)
@@ -136,7 +148,8 @@ function App() {
 
       .catch((err) => {
         console.log("ERROR! =>", err);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }
 
   //постановка и снятие лайков
@@ -158,6 +171,21 @@ function App() {
   }
 
   //закрытие попапов
+  useEffect(() => {
+    function handleEscClose(e) {
+      if (e.key === "Escape") {
+        closeAllPopups();
+      }
+    }  
+    document.addEventListener("keydown", handleEscClose, false);
+  }, []);
+
+  function handleClickClose(e) {
+    if (e.target === e.currentTarget) {
+      closeAllPopups();
+    }
+  };
+
   function closeAllPopups() {
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
@@ -247,34 +275,42 @@ function App() {
         <PopupWithForm
           name="delete"
           title="Вы уверены?"
-          btnText="Да"
+          btnText={isLoading ? "Удаление..." : "Да"}
           onSubmit={handleDeleteClick}
           onClose={closeAllPopups}
+          onClickClose ={handleClickClose}
           isOpen={isDeletePopup}
         ></PopupWithForm>
 
         <EditProfilePopup
           onClose={closeAllPopups}
+          onClickClose ={handleClickClose}
           isOpen={isEditProfilePopupOpen}
           onUpdateUser={handleOnUpdateUser}
+          isLoading={isLoading}
         ></EditProfilePopup>
 
         <AddPlacePopup
           onClose={closeAllPopups}
+          onClickClose ={handleClickClose}
           isOpen={isAddPlacePopupOpen}
           onAddCard={handleAddPlaceSubmit}
+          isLoading={isLoading}
         ></AddPlacePopup>
 
         <EditAvatarPopup
           isOpen={isEditAvatarPopupOpen}
+          onClickClose ={handleClickClose}
           onClose={closeAllPopups}
           onUpdateAvatar={handleOnUpdateAvatar}
+          isLoading={isLoading}
         ></EditAvatarPopup>
 
         <ImagePopup
           card={selectedCard}
           isOpen={isImagePopupOpen}
           onClose={closeAllPopups}
+          onClickClose ={handleClickClose}
         />
 
         <InfoTooltip
